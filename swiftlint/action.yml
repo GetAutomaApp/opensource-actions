@@ -1,0 +1,39 @@
+name: 'SwiftLint'
+description: 'A GitHub Action that runs SwiftLint with custom and default rules'
+branding:
+  icon: 'code'
+  color: 'orange'
+
+inputs:
+  extra_args:
+    description: "Extra arguments to override default lint config"
+    required: false
+    default: ""
+  working-directory:
+    description: 'Directory to run SwiftLint in'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install SwiftLint
+      shell: bash
+      run: |
+        curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint.zip
+        unzip swiftlint.zip
+        chmod +x swiftlint
+        sudo mv swiftlint /tmp/swiftlint
+    - name: Run SwiftLint
+      shell: bash
+      run: |
+        CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
+        if [[ -n "${{ inputs.working-directory }}" ]]; then
+          cd ${{ inputs.working-directory }}
+        fi
+        ls
+        /tmp/swiftlint lint $CONFIG_ARG ${{ inputs.extra_args }}
+
+outputs:
+  exit-code:
+    description: 'The exit code from the SwiftLint run'

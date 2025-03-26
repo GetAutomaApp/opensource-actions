@@ -1,0 +1,23 @@
+# This file shouldn't exceed 100 lines. The base swiftlint file is extremely opinionated
+# Any sensible overrides should be provided as override swiftlint files in `extra_args`
+
+disabled_rules:
+  - trailing_whitespace
+
+opt_in_rules:
+  - empty_count
+  - force_unwrapping
+  - explicit_self
+  - missing_docs
+
+excluded:
+  - '**/.build/**'             # Exclude all .build directories, including nested ones
+  - '**/Carthage/**'           # Exclude Carthage build directory (recursive)
+  - '**/Pods/**'               # Exclude Pods directory (recursive)
+  - '**/DerivedData/**'        # Exclude DerivedData directory (recursive)
+  - '**/*.xcodeproj'           # Exclude Xcode project files
+  - '**/*.xcworkspace'         # Exclude Xcode workspace files
+  - '**/*.swiftmodule'         # Exclude Swift module files
+  - '**/*.swiftinterface'      # Exclude Swift interface files
+
+reporter: github-actions-logging

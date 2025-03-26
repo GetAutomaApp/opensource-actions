@@ -1,0 +1,70 @@
+# SwiftLint GitHub Action
+
+A GitHub Action that runs SwiftLint to enforce Swift style and conventions in your Swift projects.
+
+## Features
+
+- Uses repository's `.swiftlint.yml` if present
+- Provides default SwiftLint rules if no configuration is found
+- Outputs results in GitHub Actions format
+- Configurable working directory
+
+## Usage
+
+Create a workflow file (e.g., `.github/workflows/swiftlint.yml`) in your repository:
+
+```yaml
+name: SwiftLint
+
+on:
+  pull_request:
+    paths:
+      - '**.swift'
+  push:
+    paths:
+      - '**.swift'
+
+jobs:
+  swiftlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run SwiftLint
+        uses: GetAutomaApp/opensource-actions/swiftlint@main
+```
+
+## Inputs
+
+### `working-directory`
+
+Optional. Directory to run SwiftLint in. Defaults to repository root ('.').
+
+### `extra_args`
+
+Optional. Additional arguments to pass to SwiftLint. This allows you to override or extend the default configuration. For example:
+
+```yaml
+- name: Run SwiftLint
+  uses: GetAutomaApp/opensource-actions/swiftlint@main
+  with:
+    extra_args: "--enable force_cast --disable line_length"
+```
+
+Common use cases for `extra_args`:
+- Enable specific rules: `--enable rule1,rule2`
+- Disable specific rules: `--disable rule1,rule2`
+- Set custom thresholds: `--line-length 120`
+
+## Outputs
+
+### `exit-code`
+
+The exit code from the SwiftLint run. 0 indicates success, non-zero indicates issues were found.
+
+## Configuration
+
+This action uses its own `.swiftlint.yml` file with default rules. You can override or extend these rules using the `extra_args` input parameter as shown above.
+
+## License
+
+MIT
