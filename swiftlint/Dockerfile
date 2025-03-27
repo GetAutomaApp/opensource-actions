@@ -1,4 +1,4 @@
-FROM swift:5.8
+FROM alpine:latest
 
 LABEL "com.github.actions.name"="SwiftLint"
 LABEL "com.github.actions.description"="A GitHub Action that runs SwiftLint with custom and default rules"
@@ -9,12 +9,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone https://github.com/realm/SwiftLint.git && \
-    cd SwiftLint && \
-    swift build -c release && \
-    mv .build/release/swiftlint /usr/local/bin/swiftlint && \
-    cd .. && \
-    rm -rf SwiftLint
+RUN curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint.zip \
+    && unzip swiftlint.zip \
+    && rm swiftlint.zip \
+    && mv swiftlint /usr/local/bin/
 
 COPY entrypoint.sh /entrypoint.sh
 COPY default.swiftlint.yml /default.swiftlint.yml
