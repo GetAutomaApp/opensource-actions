@@ -5,9 +5,7 @@ LABEL "com.github.actions.description"="A GitHub Action that runs SwiftLint with
 LABEL "com.github.actions.icon"="code"
 LABEL "com.github.actions.color"="orange"
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache curl unzip
 
 RUN curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint.zip \
     && unzip swiftlint.zip \
