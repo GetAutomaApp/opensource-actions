@@ -10,12 +10,15 @@ runs:
     - name: Install SwiftLint
       shell: bash
       run: |
-        brew install swiftlint
+        curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint.zip
+        unzip swiftlint.zip
+        chmod +x swiftlint
+        sudo mv swiftlint /tmp/swiftlint
     - name: Run SwiftLint
       shell: bash
       run: |
         cd ${{ inputs.working-directory }}
-        swiftlint lint --reporter github-actions-logging
+        /tmp/swiftlint lint --reporter github-actions-logging
 
 inputs:
   working-directory:
