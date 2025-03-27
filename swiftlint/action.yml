@@ -1,0 +1,19 @@
+name: 'SwiftLint'
+description: 'A GitHub Action that runs SwiftLint with custom and default rules'
+branding:
+  icon: 'code'
+  color: 'orange'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+
+inputs:
+  working-directory:
+    description: 'Directory to run SwiftLint in'
+    required: false
+    default: '.'
+
+outputs:
+  exit-code:
+    description: 'The exit code from the SwiftLint run'

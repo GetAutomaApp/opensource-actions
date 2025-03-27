@@ -1,0 +1,39 @@
+# Default SwiftLint configuration
+only_rules:
+  - colon
+  - comma
+  - control_statement
+  - force_cast
+  - force_try
+  - force_unwrapping
+  - leading_whitespace
+  - return_arrow_whitespace
+  - trailing_newline
+  - trailing_semicolon
+  - trailing_whitespace
+  - unused_optional_binding
+  - vertical_whitespace
+
+line_length:
+  warning: 120
+  error: 200
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 400
+  error: 1000
+
+type_name:
+  min_length: 3
+  max_length: 40
+
+identifier_name:
+  min_length: 2
+  max_length: 40
+  excluded:
+    - id
+    - URL
+    - url
+    - GlobalAPIKey
