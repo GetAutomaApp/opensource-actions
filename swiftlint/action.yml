@@ -5,8 +5,17 @@ branding:
   color: 'orange'
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'composite'
+  steps:
+    - name: Install SwiftLint
+      shell: bash
+      run: |
+        brew install swiftlint
+    - name: Run SwiftLint
+      shell: bash
+      run: |
+        cd ${{ inputs.working-directory }}
+        swiftlint lint --reporter github-actions-logging
 
 inputs:
   working-directory:

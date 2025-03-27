@@ -1,6 +1,6 @@
 # SwiftLint GitHub Action
 
-A GitHub Action that runs SwiftLint to enforce Swift style and conventions. This action supports both repository-specific configurations and provides sensible defaults.
+A GitHub Action that runs SwiftLint to enforce Swift style and conventions in your Swift projects.
 
 ## Features
 
@@ -47,7 +47,7 @@ The exit code from the SwiftLint run. 0 indicates success, non-zero indicates is
 
 ## Configuration
 
-This action will use your repository's `.swiftlint.yml` file if present. If no configuration file is found, it will use a default set of rules that enforce common Swift style guidelines.
+This action requires your repository to have a `.swiftlint.yml` file with your desired SwiftLint rules configuration.
 
 ## License
 
