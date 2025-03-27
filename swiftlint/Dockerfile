@@ -5,7 +5,7 @@ LABEL "com.github.actions.description"="A GitHub Action that runs SwiftLint with
 LABEL "com.github.actions.icon"="code"
 LABEL "com.github.actions.color"="orange"
 
-RUN apk add --no-cache curl unzip
+RUN apk add --no-cache curl unzip dos2unix
 
 RUN curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint.zip \
     && unzip swiftlint.zip \
@@ -15,6 +15,8 @@ RUN curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlin
 COPY entrypoint.sh /entrypoint.sh
 COPY default.swiftlint.yml /default.swiftlint.yml
 
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh && \
+    chown root:root /entrypoint.sh && \
+    chmod 755 /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
