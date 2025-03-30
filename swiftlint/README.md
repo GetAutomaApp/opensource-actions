@@ -28,7 +28,7 @@ jobs:
   swiftlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run SwiftLint
         uses: GetAutomaApp/opensource-actions/swiftlint@main
 ```

@@ -1,0 +1,45 @@
+name: 'CLOC'
+description: 'A GitHub Action that runs CLOC with a default config + overrides'
+branding:
+  icon: 'code'
+  color: 'orange'
+
+inputs:
+  extra_args:
+    description: "Any extra arguments / overrides when running cloc"
+    required: false
+    default: ""
+  working-directory:
+    required: false
+    description: 'Directory to run CLOC in'
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install CLOC
+      shell: bash
+      run: |
+        CLOC_VERSION="1.98"
+        CLOC_URL="https://github.com/AlDanial/cloc/releases/download/v${CLOC_VERSION}/cloc-${CLOC_VERSION}.pl"
+        sudo curl -L -o /usr/local/bin/cloc "${CLOC_URL}"
+        sudo chmod +x /usr/local/bin/cloc
+
+    - name: Run CLOC
+      id: run_cloc
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.working-directory }}" ]]; then
+          cd "${{ inputs.working-directory }}"
+        fi
+
+        CONFIG_ITEMS=$(cat ${{ github.action_path }}/.cloc-config | tr '\n' ' ')
+
+        eval "cloc $CONFIG_ITEMS ${{ inputs.extra_args }} ."
+
+        echo "exit-code=$?" >> $GITHUB_OUTPUT
+
+outputs:
+  exit-code:
+    description: 'The exit code from the CLOC run'
+    value: ${{ steps.run_cloc.outputs.exit-code }}
