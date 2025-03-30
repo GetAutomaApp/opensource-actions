@@ -56,9 +56,6 @@ The exit code from the CLOC run. A non-zero exit code indicates that CLOC encoun
 
 ## Default Configuration
 
-By default, this action excludes the following directories:
-- node_modules
-- build
-- dist
+Take a look at `cloc/.cloc-config` to see all the default config options
 
 You can override or extend these exclusions using the `extra_args` input.
