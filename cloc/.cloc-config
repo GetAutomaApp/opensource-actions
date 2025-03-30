@@ -1,0 +1,6 @@
+--not-match-f='package-lock.json'
+--not-match-f='Package.resolved'
+--not-match-f='Contents.json'
+--not-match-f='buildServer.json'
+--not-match-d='node_modules'
+--not-match-d='build'
