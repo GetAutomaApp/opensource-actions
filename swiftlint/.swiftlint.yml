@@ -82,4 +82,7 @@ identifier_name:
 cyclomatic_complexity:
   ignores_case_statements: true
 
+analyzer:
+  - unused_imports
+
 reporter: github-actions-logging
