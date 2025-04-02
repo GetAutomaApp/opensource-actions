@@ -47,13 +47,12 @@ Optional. Additional arguments to pass to SwiftLint. This allows you to override
 - name: Run SwiftLint
   uses: GetAutomaApp/opensource-actions/swiftlint@main
   with:
-    extra_args: "--enable force_cast --disable line_length"
+    extra_args: "... extra args here ..."
 ```
 
 Common use cases for `extra_args`:
-- Enable specific rules: `--enable rule1,rule2`
-- Disable specific rules: `--disable rule1,rule2`
-- Set custom thresholds: `--line-length 120`
+- Adding more config files "--config some-config-2.yml"
+- Enabling / Disabling specific features
 
 ## Outputs
 
