@@ -87,4 +87,8 @@ type_body_length:
   warning: 1000
   error: 1000
 
+type_length:
+  max_length:
+    warning: 50
+
 reporter: github-actions-logging
