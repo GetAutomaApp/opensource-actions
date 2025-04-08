@@ -82,4 +82,10 @@ identifier_name:
 cyclomatic_complexity:
   ignores_case_statements: true
 
+line_length:
+  warning: 1000
+  error: 1000
+  ignores_comments: true
+  ignores_urls: true
+
 reporter: github-actions-logging
