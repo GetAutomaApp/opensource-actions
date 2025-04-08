@@ -32,7 +32,6 @@ opt_in_rules:
   - direct_return
   - discouraged_none_name
   - explicit_acl
-  - explicit_enum_raw_value
   - explicit_init
   - explicit_top_level_acl
   - local_doc_comment
@@ -63,6 +62,7 @@ opt_in_rules:
   - unused_parameter
 
 excluded:
+  - '**/Package.swift'
   - '**/.build/**'             # Exclude all .build directories, including nested ones
   - '**/Carthage/**'           # Exclude Carthage build directory (recursive)
   - '**/Pods/**'               # Exclude Pods directory (recursive)
