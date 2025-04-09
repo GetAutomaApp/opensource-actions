@@ -20,9 +20,6 @@ on:
   pull_request:
     paths:
       - '**.swift'
-  push:
-    paths:
-      - '**.swift'
 
 jobs:
   swiftlint:
