@@ -63,15 +63,18 @@ opt_in_rules:
   - unused_parameter
 
 excluded:
-  - **/Package.swift
-  - **/.build/**             # Exclude all .build directories, including nested ones
-  - **/Carthage/**           # Exclude Carthage build directory (recursive)
-  - **/Pods/**               # Exclude Pods directory (recursive)
-  - **/DerivedData/**        # Exclude DerivedData directory (recursive)
-  - **/*.xcodeproj           # Exclude Xcode project files
-  - **/*.xcworkspace         # Exclude Xcode workspace files
-  - **/*.swiftmodule         # Exclude Swift module files
-  - **/*.swiftinterface      # Exclude Swift interface files
+  - '**/Package.swift'
+  - '**/node_modules'
+  - '**/.build'             # Exclude all .build directories, including nested ones
+  - '**/Carthage'           # Exclude Carthage build directory (recursive)
+  - '**/Pods'               # Exclude Pods directory (recursive)
+  - '**/DerivedData'        # Exclude DerivedData directory (recursive)
+  - '**/*.xcodeproj'           # Exclude Xcode project files
+  - '**/*.xcworkspace'         # Exclude Xcode workspace files
+  - '**/*.swiftmodule'         # Exclude Swift module files
+  - '**/*.swiftinterface'      # Exclude Swift interface files
+  - '**/Shared'   # Exclude shared assets
+  - '**/Sources/Assets/Fonts' # Exclude fonts
 
 identifier_name:
   min_length:
