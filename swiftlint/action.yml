@@ -17,26 +17,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Install Node.js LTS
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        VERSION="v22.14.0"
-        ARCH="linux-x64"
-        URL="https://nodejs.org/dist/${VERSION}/node-${VERSION}-${ARCH}.tar.xz"
-
-        curl -fsSL "$URL" -o node.tar.xz
-        tar -xf node.tar.xz
-        mv "node-${VERSION}-${ARCH}" /tmp/node
-
-        echo "/tmp/node/bin" >> $GITHUB_PATH
     - name: Clone & Setup Dotfiles
       shell: bash
       run: |
         git clone https://github.com/GetAutomaApp/dotfiles.git "${{ github.action_path }}/.dotfiles"
         cd "${{ github.action_path }}"
-        npm run config
+        ./.dotfiles/config.sh
     - name: Install SwiftLint
       shell: bash
       run: |
