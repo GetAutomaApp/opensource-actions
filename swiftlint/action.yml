@@ -39,8 +39,8 @@ runs:
         chmod +x swiftlint
         sudo mv swiftlint /tmp/swiftlint
     - name: Run SwiftLint
-      run: |
       shell: bash
+      run: |
         npm run config
         CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
