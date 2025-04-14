@@ -35,6 +35,8 @@ runs:
       shell: bash
       run: |
         cd ${{ github.action_path }}
+        pwd
+        ls
         git clone https://github.com/GetAutomaApp/dotfiles.git .dotfiles
         npm run config
     - name: Install SwiftLint
