@@ -22,9 +22,6 @@ runs:
       run: |
         git clone https://github.com/GetAutomaApp/dotfiles.git "${{ github.action_path }}/.dotfiles"
         cd "${{ github.action_path }}"
-        ls -a
-        ls -a .dotfiles
-        cat .dotfiles/config.sh
         .dotfiles/config.sh
     - name: Install SwiftLint
       shell: bash
