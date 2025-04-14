@@ -17,6 +17,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Init Submodules
+      shell: bash
+      run: |
+        git submodule init
+        git submodule update --recursive --depth 1
+
     - name: Install Node.js LTS
       shell: bash
       run: |
