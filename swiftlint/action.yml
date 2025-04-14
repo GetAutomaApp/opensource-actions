@@ -47,8 +47,8 @@ runs:
     - name: Run SwiftLint
       shell: bash
       run: |
-        ls .dotfiles
-        npm run config
+        cd ${{ github.action_path}} ; npm run config
+        cd ../
         CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
           cd ${{ inputs.working-directory }}
