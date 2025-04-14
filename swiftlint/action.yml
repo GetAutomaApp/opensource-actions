@@ -17,12 +17,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Init Submodules
-      shell: bash
-      run: |
-        cd ${{ github.action_path }}/../
-        git submodule init
-        git submodule update --recursive --depth 1
     - name: Install Node.js LTS
       shell: bash
       run: |
@@ -37,6 +31,12 @@ runs:
         mv "node-${VERSION}-${ARCH}" /tmp/node
 
         echo "/tmp/node/bin" >> $GITHUB_PATH
+    - name: Clone & Setup Dotfiles
+      shell: bash
+      run: |
+        cd ${{ github.action_path }}
+        git clone https://github.com/GetAutomaApp/dotfiles.git .dotfiles
+        npm run config
     - name: Install SwiftLint
       shell: bash
       run: |
@@ -47,7 +47,6 @@ runs:
     - name: Run SwiftLint
       shell: bash
       run: |
-        npm run config
         CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
           cd ${{ inputs.working-directory }}
