@@ -17,6 +17,20 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Install Node.js LTS
+      shell: bash
+      run: |
+        NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | grep 'lts' | grep -m1 -oP '"version": "\K[^"]+')
+        ARCH="linux-x64"
+        NODE_DIR="node-$NODE_VERSION-$ARCH"
+        NODE_URL="https://nodejs.org/dist/$NODE_VERSION/$NODE_DIR.tar.xz"
+
+        curl -sSL $NODE_URL -o node.tar.xz
+        tar -xf node.tar.xz
+        mv $NODE_DIR /tmp/node
+
+        echo "/tmp/node/bin" >> $GITHUB_PATH
+
     - name: Install SwiftLint
       shell: bash
       run: |
@@ -27,6 +41,7 @@ runs:
     - name: Run SwiftLint
       shell: bash
       run: |
+        npm run config
         CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
           cd ${{ inputs.working-directory }}

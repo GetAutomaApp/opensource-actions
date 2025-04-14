@@ -1,0 +1,3 @@
+[submodule "swiftlint/.dotfiles"]
+	path = swiftlint/.dotfiles
+	url = https://github.com/GetAutomaApp/dotfiles
