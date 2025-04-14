@@ -20,7 +20,7 @@ runs:
     - name: Init Submodules
       shell: bash
       run: |
-        cd ${{ github.action_path }}
+        cd ${{ github.action_path }}/../
         git submodule init
         git submodule update --recursive --depth 1
     - name: Install Node.js LTS
