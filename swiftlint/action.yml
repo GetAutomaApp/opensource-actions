@@ -22,7 +22,6 @@ runs:
       run: |
         git submodule init
         git submodule update --recursive --depth 1
-
     - name: Install Node.js LTS
       shell: bash
       run: |
@@ -47,8 +46,8 @@ runs:
     - name: Run SwiftLint
       shell: bash
       run: |
-        cd ${{ github.action_path}} ; npm run config
-        cd ../
+        ls .dotfiles
+        npm run config
         CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
           cd ${{ inputs.working-directory }}
