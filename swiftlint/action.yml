@@ -20,17 +20,17 @@ runs:
     - name: Install Node.js LTS
       shell: bash
       run: |
-        NODE_VERSION=$(curl -s https://nodejs.org/dist/index.json | grep 'lts' | grep -m1 -oP '"version": "\K[^"]+')
-        ARCH="linux-x64"
-        NODE_DIR="node-$NODE_VERSION-$ARCH"
-        NODE_URL="https://nodejs.org/dist/$NODE_VERSION/$NODE_DIR.tar.xz"
+        set -euo pipefail
 
-        curl -sSL $NODE_URL -o node.tar.xz
+        VERSION="v22.14.0"
+        ARCH="linux-x64"
+        URL="https://nodejs.org/dist/${VERSION}/node-${VERSION}-${ARCH}.tar.xz"
+
+        curl -fsSL "$URL" -o node.tar.xz
         tar -xf node.tar.xz
-        mv $NODE_DIR /tmp/node
+        mv "node-${VERSION}-${ARCH}" /tmp/node
 
         echo "/tmp/node/bin" >> $GITHUB_PATH
-
     - name: Install SwiftLint
       shell: bash
       run: |
@@ -39,8 +39,8 @@ runs:
         chmod +x swiftlint
         sudo mv swiftlint /tmp/swiftlint
     - name: Run SwiftLint
-      shell: bash
       run: |
+      shell: bash
         npm run config
         CONFIG_ARG="--config ${{ github.action_path }}/.swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
