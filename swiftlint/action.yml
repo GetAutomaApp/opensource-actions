@@ -51,7 +51,6 @@ runs:
         if [[ -n "${{ inputs.working-directory }}" ]]; then
           cd ${{ inputs.working-directory }}
         fi
-        ls
         /tmp/swiftlint lint $CONFIG_ARG ${{ inputs.extra_args }}
 
 outputs:
