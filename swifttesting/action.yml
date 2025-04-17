@@ -1,0 +1,85 @@
+name: 'SwiftTesting'
+description: 'A GitHub Action that runs SwiftTesting & Composes if need-be'
+branding:
+  icon: 'code'
+  color: 'orange'
+
+inputs:
+  working-directory:
+    description: 'Directory to run SwiftLint in'
+    required: false
+    default: '.'
+  compose:
+    description: 'Whether or not to compose if a compose-file exists in desired path'
+    required: false
+    default: 'true'
+  compose-file:
+    description: 'If the compose file isnt in the working-directory set this path as an override (relative to working-directory)'
+    required: false
+    default: ''
+
+outputs:
+  exit-code:
+    description: 'The exit code from the SwiftLint run'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Docker (Standalone Binary)
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        DOCKER_VERSION="25.0.3"
+        ARCH="x86_64"
+        BASE_URL="https://download.docker.com/linux/static/stable"
+
+        curl -fsSL "$BASE_URL/$ARCH/docker-${DOCKER_VERSION}.tgz" -o docker.tgz
+        tar xzvf docker.tgz
+        sudo mv docker/* /usr/local/bin/
+        docker --version
+
+    - name: Install Docker Compose (v2 Plugin)
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        COMPOSE_VERSION="v2.27.0"
+        DEST="/usr/local/lib/docker/cli-plugins"
+
+        sudo mkdir -p "$DEST"
+        curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-x86_64" -o "$DEST/docker-compose"
+        sudo chmod +x "$DEST/docker-compose"
+
+        echo "$DEST" >> $GITHUB_PATH
+
+        docker compose version
+
+    - name: Run Tests
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
+
+        if [[ -n "${{ inputs.working-directory }}" ]]; then
+          cd "${{ inputs.working-directory }}"
+        fi
+
+        if [[ "${{ inputs.compose }}" == "true" ]]; then
+          echo "Composing with Docker"
+
+          if [[ -z "${{ inputs.compose-file }}" ]]; then
+            echo "Using default docker-compose.yml"
+            docker compose up -d
+          else
+            echo "Using overridden compose file: '${{ inputs.compose-file }}'"
+            docker compose -f "${{ inputs.compose-file }}" up -d
+          fi
+
+        else
+          echo "Not using Docker Compose"
+        fi
+
+        echo "Running Swift Tests"
+        swift test
