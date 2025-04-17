@@ -44,7 +44,7 @@ runs:
       run: |
         set -euo pipefail
 
-        COMPOSE_VERSION="v2.27.0"
+        COMPOSE_VERSION="v2.35.0"
         DEST="/usr/local/lib/docker/cli-plugins"
 
         sudo mkdir -p "$DEST"
