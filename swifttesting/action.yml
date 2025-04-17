@@ -14,7 +14,7 @@ inputs:
     required: false
     default: 'true'
   compose-file:
-    description: 'If the compose file isn't in the working-directory set this path as an override (relative to working-directory)'
+    description: 'If the compose file isnt in the working-directory set this path as an override (relative to working-directory)'
     required: false
     default: ''
 
