@@ -42,7 +42,7 @@ runs:
           mkdir -p ~/.docker/cli-plugins
           ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
 
-          sudo curl -L -o /opt/homebrew/Cellar/lima/0.22.0/bin/limactl https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x /opt/homebrew/Cellar/lima/0.22.0/bin/limactl
+          sudo curl -L -o /opt/homebrew/Cellar/lima/1.0.7/bin/limactl https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x /opt/homebrew/Cellar/lima/0.22.0/bin/limactl
           colima start --network-address --arch arm64 --vm-type=qemu
 
           echo "Ensuring Docker CLI is available..."
