@@ -38,7 +38,7 @@ runs:
           brew install docker docker-compose colima
 
           echo "Starting Colima..."
-          colima start
+          colima start --mount-type 9p
 
           echo "Ensuring Docker CLI is available..."
           docker --version
