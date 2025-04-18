@@ -25,37 +25,54 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Install Docker (Standalone Binary)
+    - name: Install Docker and Docker Compose
       shell: bash
       run: |
         set -euo pipefail
 
-        DOCKER_VERSION="28.1.0"
-        ARCH="x86_64"
-        BASE_URL="https://download.docker.com/linux/static/stable"
+        echo "Detecting OS..."
+        OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 
-        echo "Downloading Docker $DOCKER_VERSION..."
-        curl -fsSL "$BASE_URL/$ARCH/docker-${DOCKER_VERSION}.tgz" -o docker.tgz
-        tar xzvf docker.tgz
-        sudo mv docker/* /usr/local/bin/
-        docker --version
+        if [[ "$OS" == "darwin" ]]; then
+          echo "macOS detected. Installing Docker and Docker Compose via Homebrew..."
+          brew install --cask docker
+          brew install docker-compose
 
-    - name: Install Docker Compose v2 (Plugin Method)
-      shell: bash
-      run: |
-        set -euo pipefail
+          echo "Ensuring Docker CLI is available..."
+          which docker
+          docker --version
 
-        COMPOSE_VERSION="v2.35.0"
-        DEST="$HOME/.docker/cli-plugins"
+          echo "Ensuring Docker Compose is available..."
+          which docker-compose
+          docker-compose version
 
-        echo "Installing Docker Compose $COMPOSE_VERSION into $DEST..."
-        mkdir -p "$DEST"
-        curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-x86_64" \
-          -o "$DEST/docker-compose"
-        chmod +x "$DEST/docker-compose"
+        elif [[ "$OS" == "linux" ]]; then
+          echo "Linux detected. Installing Docker and Docker Compose (Standalone)..."
 
-        echo "$HOME/.docker/cli-plugins" >> "$GITHUB_PATH"
-        docker compose version
+          DOCKER_VERSION="28.1.0"
+          COMPOSE_VERSION="v2.35.0"
+          ARCH="x86_64"
+          BASE_URL="https://download.docker.com/linux/static/stable"
+          DEST="$HOME/.docker/cli-plugins"
+
+          echo "Downloading Docker $DOCKER_VERSION..."
+          curl -fsSL "$BASE_URL/$ARCH/docker-${DOCKER_VERSION}.tgz" -o docker.tgz
+          tar xzvf docker.tgz
+          sudo mv docker/* /usr/local/bin/
+          docker --version
+
+          echo "Installing Docker Compose $COMPOSE_VERSION into $DEST..."
+          mkdir -p "$DEST"
+          curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCH}" \
+            -o "$DEST/docker-compose"
+          chmod +x "$DEST/docker-compose"
+
+          echo "$DEST" >> "$GITHUB_PATH"
+          docker compose version
+        else
+          echo "Unsupported OS: $OS"
+          exit 1
+        fi
 
     - name: Run Tests
       shell: bash
