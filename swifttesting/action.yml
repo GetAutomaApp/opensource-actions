@@ -72,6 +72,7 @@ runs:
         else
           echo "Unsupported OS: $OS"
           exit 1
+
         fi
 
     - name: Run Tests
@@ -82,20 +83,34 @@ runs:
         echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
         cd "${{ inputs.working-directory }}"
 
+        echo "Checking Docker availability..."
+        docker --version || { echo "Docker not available"; exit 1; }
+        docker compose version || { echo "Docker Compose not available"; exit 1; }
+
+        echo "Running in directory: $(pwd)"
+        echo "Listing files in parent directory:"
+        ls -l ..
+
         if [[ "${{ inputs.compose }}" == "true" ]]; then
           echo "Composing with Docker"
-          if [[ -z "${{ inputs.compose-file }}" ]]; then
-            echo "Using default docker-compose.yml"
-            docker compose up -d
-          else
+
+          if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
             echo "Using overridden compose file: '${{ inputs.compose-file }}'"
             docker compose -f "${{ inputs.compose-file }}" up -d
+          else
+            echo "No valid override compose file found or not provided. Using default docker-compose.yml"
+            docker compose up -d
           fi
         else
           echo "Not using Docker Compose"
         fi
 
         echo "Running Swift Tests"
-        swift test
-
-        echo "exit-code=$?" >> "$GITHUB_OUTPUT"
+        if swift test; then
+          echo "Swift tests passed."
+          echo "exit-code=0" >> "$GITHUB_OUTPUT"
+        else
+          echo "Swift tests failed!"
+          echo "exit-code=1" >> "$GITHUB_OUTPUT"
+        fi
+          exit 1
