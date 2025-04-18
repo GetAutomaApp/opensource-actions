@@ -42,7 +42,7 @@ runs:
           mkdir -p ~/.docker/cli-plugins
           ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
 
-          colima start --vm-type vz
+          colima start --vm-type vz || cat /Users/runner/.colima/_lima/colima/ha.stderr.log
 
           echo "Ensuring Docker CLI is available..."
           docker --version
