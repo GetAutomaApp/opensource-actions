@@ -45,7 +45,7 @@ runs:
           docker --version
 
           echo "Ensuring Docker Compose is available..."
-          docker compose version
+          docker-compose version
 
         elif [[ "$OS" == "linux" ]]; then
           echo "Linux detected. Installing Docker and Docker Compose (Standalone)..."
@@ -92,10 +92,10 @@ runs:
 
           if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
             echo "Using overridden compose file: '${{ inputs.compose-file }}'"
-            docker compose -f "${{ inputs.compose-file }}" up -d
+            docker-compose -f "${{ inputs.compose-file }}" up -d
           else
             echo "No valid override compose file found or not provided. Using default docker-compose.yml"
-            docker compose up -d
+            docker-compose up -d
           fi
         else
           echo "Not using Docker Compose"
