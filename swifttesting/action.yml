@@ -72,7 +72,6 @@ runs:
         else
           echo "Unsupported OS: $OS"
           exit 1
-
         fi
 
     - name: Run Tests
@@ -83,10 +82,6 @@ runs:
         echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
         cd "${{ inputs.working-directory }}"
 
-        echo "Checking Docker availability..."
-        docker --version || { echo "Docker not available"; exit 1; }
-        docker compose version || { echo "Docker Compose not available"; exit 1; }
-
         echo "Running in directory: $(pwd)"
         echo "Listing files in parent directory:"
         ls -l ..
@@ -96,10 +91,10 @@ runs:
 
           if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
             echo "Using overridden compose file: '${{ inputs.compose-file }}'"
-            docker compose -f "${{ inputs.compose-file }}" up -d
+            docker-compose -f "${{ inputs.compose-file }}" up -d
           else
             echo "No valid override compose file found or not provided. Using default docker-compose.yml"
-            docker compose up -d
+            docker-compose up -d
           fi
         else
           echo "Not using Docker Compose"
