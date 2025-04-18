@@ -79,6 +79,19 @@ runs:
       run: |
         set -euo pipefail
 
+        echo "Starting Docker Daemon"
+        OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+
+        if [[ "$OS" == "darwin" ]]; then
+          open --background -a Docker
+        elif [[ "$OS" == "linux" ]]; then
+          service docker status
+        else
+          echo "Unsupported OS: $OS"
+          exit 1
+        fi
+
+
         echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
         cd "${{ inputs.working-directory }}"
 
