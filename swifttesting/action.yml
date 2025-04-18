@@ -1,31 +1,31 @@
-name: 'SwiftTesting'
-description: 'A GitHub Action that runs SwiftTesting & Composes if need-be'
+name: "SwiftTesting"
+description: "A GitHub Action that runs SwiftTesting & Composes if need-be"
 branding:
-  icon: 'code'
-  color: 'orange'
+  icon: "code"
+  color: "orange"
 
 inputs:
   working-directory:
-    description: 'Directory to run SwiftLint in'
+    description: "Directory to run SwiftLint in"
     required: false
-    default: '.'
+    default: "."
   compose:
-    description: 'Whether or not to compose if a compose-file exists in desired path'
+    description: "Whether or not to compose if a compose-file exists in desired path"
     required: false
-    default: 'true'
+    default: "true"
   compose-file:
-    description: 'If the compose file isnt in the working-directory set this path as an override (relative to working-directory)'
+    description: "If the compose file isnt in the working-directory set this path as an override (relative to working-directory)"
     required: false
-    default: ''
+    default: ""
 
 outputs:
   exit-code:
-    description: 'The exit code from the Swift test run'
+    description: "The exit code from the Swift test run"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
-    - name: Install Docker and Docker Compose
+    - name: Install Docker, Docker Compose
       shell: bash
       run: |
         set -euo pipefail
@@ -34,17 +34,17 @@ runs:
         OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 
         if [[ "$OS" == "darwin" ]]; then
-          echo "macOS detected. Installing Docker and Docker Compose via Homebrew..."
-          brew install --cask docker
-          brew install docker-compose
+          echo "macOS detected. Installing Docker, Compose, and Colima via Homebrew..."
+          brew install docker docker-compose colima
+
+          echo "Starting Colima..."
+          colima start
 
           echo "Ensuring Docker CLI is available..."
-          which docker
           docker --version
 
           echo "Ensuring Docker Compose is available..."
-          which docker-compose
-          docker-compose version
+          docker compose version
 
         elif [[ "$OS" == "linux" ]]; then
           echo "Linux detected. Installing Docker and Docker Compose (Standalone)..."
@@ -79,19 +79,6 @@ runs:
       run: |
         set -euo pipefail
 
-        echo "Starting Docker Daemon"
-        OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-
-        if [[ "$OS" == "darwin" ]]; then
-          open --background -a Docker
-        elif [[ "$OS" == "linux" ]]; then
-          service docker status
-        else
-          echo "Unsupported OS: $OS"
-          exit 1
-        fi
-
-
         echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
         cd "${{ inputs.working-directory }}"
 
@@ -104,10 +91,10 @@ runs:
 
           if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
             echo "Using overridden compose file: '${{ inputs.compose-file }}'"
-            docker-compose -f "${{ inputs.compose-file }}" up -d
+            docker compose -f "${{ inputs.compose-file }}" up -d
           else
             echo "No valid override compose file found or not provided. Using default docker-compose.yml"
-            docker-compose up -d
+            docker compose up -d
           fi
         else
           echo "Not using Docker Compose"
@@ -120,5 +107,5 @@ runs:
         else
           echo "Swift tests failed!"
           echo "exit-code=1" >> "$GITHUB_OUTPUT"
-        fi
           exit 1
+        fi
