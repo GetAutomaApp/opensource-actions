@@ -54,7 +54,7 @@ runs:
             echo "Ensuring Docker Compose is available..."
             docker-compose version
 
-          elif [[ "$OS" == "linux" && ${{ inputs.compose }} != "true" ]]; then
+          elif [[ "$OS" == "linux" && ${{ inputs.compose }} == "true" ]]; then
             echo "Linux detected. Installing Docker and Docker Compose (Standalone)..."
 
             DOCKER_VERSION="28.1.0"
