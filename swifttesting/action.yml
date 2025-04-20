@@ -17,8 +17,12 @@ inputs:
     description: "If the compose file isnt in the working-directory set this path as an override (relative to working-directory)"
     required: false
     default: ""
-  extra_args:
+  swift_test_extra_args:
     description: "Extra arguments to run swift tests"
+    required: false
+    default: ""
+  docker_compose_extra_args:
+    description: "Extra arguments for docker-compose"
     required: false
     default: ""
 
@@ -101,10 +105,10 @@ runs:
 
           if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
             echo "Using overridden compose file: '${{ inputs.compose-file }}'"
-            docker-compose -f "${{ inputs.compose-file }}" up -d
+            docker-compose -f "${{ inputs.compose-file }}" up -d ${{ inputs.docker_compose_extra_args }}
           else
             echo "No valid override compose file found or not provided. Using default docker-compose.yml"
-            docker-compose up -d
+            docker-compose up -d ${{ inputs.docker_compose_extra_args }}
           fi
         else
           echo "Not using Docker Compose"
