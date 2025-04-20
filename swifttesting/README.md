@@ -49,6 +49,12 @@ Eg: `../project-dependencies.compose.yml`
 Common use cases for `compose-file`:
 - Project level compose-file with required dependencies for sub-projects / swift packages (monorepos)
 
+## `extra_args`
+
+Optional. If specified this will pass extra arguments to the `swift test` command.
+
+Eg: `--filter ".*UnitTests.*` will run unit tests only!
+
 ## Outputs
 
 ### `exit-code`

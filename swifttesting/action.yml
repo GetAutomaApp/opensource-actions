@@ -17,6 +17,10 @@ inputs:
     description: "If the compose file isnt in the working-directory set this path as an override (relative to working-directory)"
     required: false
     default: ""
+  extra_args:
+    description: "Extra arguments to run swift tests"
+    required: false
+    default: ""
 
 outputs:
   exit-code:
@@ -107,7 +111,7 @@ runs:
         fi
 
         echo "Running Swift Tests"
-        if swift test; then
+        if swift test ${{ inputs.extra_args }}; then
           echo "Swift tests passed."
           echo "exit-code=0" >> "$GITHUB_OUTPUT"
         else
