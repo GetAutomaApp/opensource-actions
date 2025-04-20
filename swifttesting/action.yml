@@ -1,0 +1,117 @@
+name: "SwiftTesting"
+description: "A GitHub Action that runs SwiftTesting & Composes if need-be"
+branding:
+  icon: "code"
+  color: "orange"
+
+inputs:
+  working-directory:
+    description: "Directory to run SwiftTesting in"
+    required: false
+    default: "."
+  compose:
+    description: "Whether or not to compose if a compose-file exists in desired path"
+    required: false
+    default: "true"
+  compose-file:
+    description: "If the compose file isnt in the working-directory set this path as an override (relative to working-directory)"
+    required: false
+    default: ""
+
+outputs:
+  exit-code:
+    value: ${{ steps.run-tests.outputs.exit-code }}
+    description: "The exit code from the Swift test run"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install Docker, Docker Compose
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        echo "Detecting OS..."
+        OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+
+        if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
+            echo "Both Docker and Docker Compose are installed"
+        else
+          if [[ "$OS" == "darwin" && ${{ inputs.compose }} == "true" ]]; then
+            echo "macOS detected. Installing Docker, Compose, and Colima via Homebrew..."
+
+            brew install docker docker-compose colima qemu
+
+            mkdir -p ~/.docker/cli-plugins
+            ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+
+            sudo curl -L -o /opt/homebrew/Cellar/lima/1.0.7/bin/limactl https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x /opt/homebrew/Cellar/lima/1.0.7/bin/limactl
+            colima start --network-address --arch arm64 --vm-type=qemu
+
+            echo "Ensuring Docker CLI is available..."
+            docker --version
+
+            echo "Ensuring Docker Compose is available..."
+            docker-compose version
+
+          elif [[ "$OS" == "linux" && ${{ inputs.compose }} == "true" ]]; then
+            echo "Linux detected. Installing Docker and Docker Compose (Standalone)..."
+
+            DOCKER_VERSION="28.1.0"
+            COMPOSE_VERSION="v2.35.0"
+            ARCH="x86_64"
+            BASE_URL="https://download.docker.com/linux/static/stable"
+            DEST="$HOME/.docker/cli-plugins"
+
+            echo "Downloading Docker $DOCKER_VERSION..."
+            curl -fsSL "$BASE_URL/$ARCH/docker-${DOCKER_VERSION}.tgz" -o docker.tgz
+            tar xzvf docker.tgz
+            sudo mv docker/* /usr/local/bin/
+            docker --version
+
+            echo "Installing Docker Compose $COMPOSE_VERSION into $DEST..."
+            mkdir -p "$DEST"
+            curl -fsSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-${ARCH}" \
+              -o "$DEST/docker-compose"
+            chmod +x "$DEST/docker-compose"
+
+            echo "$DEST" >> "$GITHUB_PATH"
+            docker compose version
+          fi
+        fi
+
+    - name: Run Tests
+      id: run-tests
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
+        cd "${{ inputs.working-directory }}"
+
+        echo "Running in directory: $(pwd)"
+        echo "Listing files in parent directory:"
+
+        if [[ "${{ inputs.compose }}" == "true" ]]; then
+          echo "Composing with Docker"
+
+          if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
+            echo "Using overridden compose file: '${{ inputs.compose-file }}'"
+            docker-compose -f "${{ inputs.compose-file }}" up -d
+          else
+            echo "No valid override compose file found or not provided. Using default docker-compose.yml"
+            docker-compose up -d
+          fi
+        else
+          echo "Not using Docker Compose"
+        fi
+
+        echo "Running Swift Tests"
+        if swift test; then
+          echo "Swift tests passed."
+          echo "exit-code=0" >> "$GITHUB_OUTPUT"
+        else
+          echo "Swift tests failed!"
+          echo "exit-code=1" >> "$GITHUB_OUTPUT"
+          exit 1
+        fi
