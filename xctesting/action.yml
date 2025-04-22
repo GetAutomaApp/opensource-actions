@@ -15,6 +15,9 @@ inputs:
   destination:
     description: "String arguments for the `destination` flag"
     required: true
+  testing-targets:
+    description: "Comma separated testing targets Eg: IOSUnitTests,IOSUITests"
+    required: true
 
 outputs:
   exit-code:
@@ -28,7 +31,23 @@ runs:
       id: run-tests
       shell: bash
       run: |
-        cd ${{ inputs.working-directory }}
+        set -e
+
+        cd "${{ inputs.working-directory }}"
+
+        IFS=',' read -ra TARGETS <<< "${{ inputs.testing-targets }}"
+
+        ONLY_TESTING_ARGS=""
+        for TARGET in "${TARGETS[@]}"; do
+          ONLY_TESTING_ARGS="$ONLY_TESTING_ARGS -only-testing:$TARGET"
+        done
+
+        echo "Running tests with targets: ${TARGETS[*]}"
+        echo "xcodebuild test -scheme '${{ inputs.schema }}' -destination '${{ inputs.destination }}' $ONLY_TESTING_ARGS"
+
+        set +e
         xcodebuild test \
-          -scheme '${{ inputs.schema }}' \
-          -destination '${{ inputs.destination }}'
+          -scheme "${{ inputs.schema }}" \
+          -destination "${{ inputs.destination }}" \
+          $ONLY_TESTING_ARGS
+        echo "exit-code=$?" >> $GITHUB_OUTPUT
