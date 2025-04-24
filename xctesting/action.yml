@@ -19,11 +19,6 @@ inputs:
     description: "Comma separated testing targets Eg: IOSUnitTests,IOSUITests"
     required: true
 
-outputs:
-  exit-code:
-    value: ${{ steps.run-tests.outputs.exit-code }}
-    description: "The exit code from the Swift test run"
-
 runs:
   using: "composite"
   steps:
@@ -50,4 +45,9 @@ runs:
           -scheme "${{ inputs.schema }}" \
           -destination "${{ inputs.destination }}" \
           $ONLY_TESTING_ARGS
-        echo "exit-code=$?" >> $GITHUB_OUTPUT
+
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "❌ xcodebuild failed with exit code $EXIT_CODE"
+          exit $EXIT_CODE
+        fi

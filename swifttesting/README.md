@@ -21,7 +21,7 @@ on:
       - '**.swift'
 
 jobs:
-  swiftlint:
+  swifttesting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
