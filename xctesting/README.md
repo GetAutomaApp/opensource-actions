@@ -11,7 +11,6 @@ A GitHub Action that runs XCTesting to ensure tests pass before merging PRs / De
 ## Usage
 
 Create a workflow file (e.g., `.github/workflows/test-app.yml`) in your repository:
-
 ```yaml
 name: Test IOS App
 
@@ -53,12 +52,6 @@ Non-Optional. On what you want to run tests (Eg: `platform-iOS Simulator,name iP
 
 ### Testing Targets
 Non-Optional. Comma separated testing targets Eg: IOSUnitTests,IOSUITests
-
-## Outputs
-
-### `exit-code`
-
-The exit code from the SwiftTesting run. 0 indicates success, non-zero indicates issues were found.
 
 ## License
 
