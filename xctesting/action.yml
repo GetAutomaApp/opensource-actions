@@ -1,0 +1,53 @@
+name: "XCTesting"
+description: "A GitHub Action that runs `xcodebuild test`"
+branding:
+  icon: "code"
+  color: "orange"
+
+inputs:
+  working-directory:
+    description: "Directory to run `xcodebuild test` in. Default `.`"
+    required: false
+    default: "."
+  schema:
+    description: "The schema you want to run tests for"
+    required: true
+  destination:
+    description: "String arguments for the `destination` flag"
+    required: true
+  testing-targets:
+    description: "Comma separated testing targets Eg: IOSUnitTests,IOSUITests"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Tests
+      id: run-tests
+      shell: bash
+      run: |
+        set -e
+
+        cd "${{ inputs.working-directory }}"
+
+        IFS=',' read -ra TARGETS <<< "${{ inputs.testing-targets }}"
+
+        ONLY_TESTING_ARGS=""
+        for TARGET in "${TARGETS[@]}"; do
+          ONLY_TESTING_ARGS="$ONLY_TESTING_ARGS -only-testing:$TARGET"
+        done
+
+        echo "Running tests with targets: ${TARGETS[*]}"
+        echo "xcodebuild test -scheme '${{ inputs.schema }}' -destination '${{ inputs.destination }}' $ONLY_TESTING_ARGS"
+
+        set +e
+        xcodebuild test \
+          -scheme "${{ inputs.schema }}" \
+          -destination "${{ inputs.destination }}" \
+          $ONLY_TESTING_ARGS
+
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "❌ xcodebuild failed with exit code $EXIT_CODE"
+          exit $EXIT_CODE
+        fi
