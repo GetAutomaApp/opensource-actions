@@ -10,6 +10,10 @@ A GitHub Action that runs XCTesting to ensure tests pass before merging PRs / De
 
 ## Usage
 
+> [!NOTE]
+> We recommend to make use of `macincloud` macos runners instead of github hosted runners. They're way cheaper!!
+> https://portal.macincloud.com/select
+
 Create a workflow file (e.g., `.github/workflows/test-app.yml`) in your repository:
 ```yaml
 name: Test IOS App
@@ -21,8 +25,8 @@ on:
 
 jobs:
   xctesting:
+    runs-on: [macos-latest, self-hosted]
     # Highly recommend to use selfhosted mac runners as they are cheaper
-    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
