@@ -47,10 +47,11 @@ runs:
     - name: Run SwiftLint
       shell: bash
       run: |
+        CONFIG_ARG="--config .swiftlint.yml"
         if [[ -n "${{ inputs.working-directory }}" ]]; then
           cd ${{ inputs.working-directory }}
         fi
-        /tmp/swiftlint lint ${{ inputs.extra_args }}
+        /tmp/swiftlint lint $CONFIG_ARG ${{ inputs.extra_args }}
 
 outputs:
   exit-code:
