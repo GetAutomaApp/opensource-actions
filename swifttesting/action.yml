@@ -92,7 +92,7 @@ runs:
       id: cache-build-restore
       uses: actions/cache/restore@v4
       with:
-        key: deploy-cache-${{ hashFiles(inputs.working-directory + '/Package.resolved') }}
+        key: deploy-cache-${{ hashFiles('${{ inputs.working-directory }}/Package.resolved') }}
         path: ${{ inputs.working-directory }}/.build
 
     - name: Run Tests
