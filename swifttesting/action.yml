@@ -88,6 +88,13 @@ runs:
           fi
         fi
 
+    - name: Get Cache
+      uses: actions/cache@v3
+      id: backend-build
+      with:
+        key: deploy-cache-${{ hashFiles(inputs.working-directory + '/Package.resolved') }}
+        path: ${{ inputs.working-directory }}/.build
+
     - name: Run Tests
       id: run-tests
       shell: bash
