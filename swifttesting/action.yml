@@ -10,10 +10,10 @@ inputs:
     required: false
     default: "."
   compose:
-    description: "Whether or not to compose if a compose-file exists in desired path"
+    description: "Whether or not to compose if a compose_file exists in desired path"
     required: false
     default: "true"
-  compose-file:
+  compose_file:
     description: "If the compose file isnt in the working-directory set this path as an override (relative to working-directory)"
     required: false
     default: ""
@@ -97,9 +97,9 @@ runs:
       run: |
         set -euo pipefail
 
-        COMPOSE_ENABLED="${{ inputs.docker-compose }}"
+        COMPOSE_ENABLED="${{ inputs.compose }}"
         WORKDIR="${{ inputs.working-directory }}"
-        COMPOSE_FILE_OVERRIDE="${{ inputs.compose-file }}"
+        COMPOSE_FILE_OVERRIDE="${{ inputs.compose_file }}"
         EXTRA_ARGS="${{ inputs.docker_compose_extra_args }}"
         REQUIRED_SERVICES='${{ inputs.required_healthy_services_docker_compose }}'
 
