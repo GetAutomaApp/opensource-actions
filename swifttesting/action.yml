@@ -25,6 +25,10 @@ inputs:
     description: "Extra arguments for docker-compose"
     required: false
     default: ""
+  required_healthy_services_docker_compose:
+    description: 'Array of docker-compose services that must be healthy before running tests'
+    required: false
+    default: '[]' # Expecting a JSON array of strings
 
 outputs:
   exit-code:
@@ -88,33 +92,62 @@ runs:
           fi
         fi
 
-    - name: Run Tests
-      id: run-tests
+    - name: Wait for required services to be healthy
       shell: bash
       run: |
         set -euo pipefail
 
-        echo "Preparing to package in working directory: '${{ inputs.working-directory }}'"
-        cd "${{ inputs.working-directory }}"
+        COMPOSE_ENABLED="${{ inputs.docker-compose }}"
+        WORKDIR="${{ inputs.working-directory }}"
+        COMPOSE_FILE_OVERRIDE="${{ inputs.compose-file }}"
+        EXTRA_ARGS="${{ inputs.docker_compose_extra_args }}"
+        REQUIRED_SERVICES='${{ inputs.required_healthy_services_docker_compose }}'
 
-        echo "Running in directory: $(pwd)"
-        echo "Listing files in parent directory:"
-
-        if [[ "${{ inputs.compose }}" == "true" ]]; then
-          echo "Composing with Docker"
-
-          if [[ -n "${{ inputs.compose-file }}" && -f "${{ inputs.compose-file }}" ]]; then
-            echo "Using overridden compose file: '${{ inputs.compose-file }}'"
-            docker-compose -f "${{ inputs.compose-file }}" up -d ${{ inputs.docker_compose_extra_args }}
-          else
-            echo "No valid override compose file found or not provided. Using default docker-compose.yml"
-            docker-compose up -d ${{ inputs.docker_compose_extra_args }}
-          fi
-        else
-          echo "Not using Docker Compose"
+        if [[ "$COMPOSE_ENABLED" == "false" ]]; then
+          echo "Skipping docker-compose setup as it's disabled."
+          exit 0
         fi
 
+        cd "$WORKDIR"
+
+        echo "Parsing required services from input: $REQUIRED_SERVICES"
+        services=$(echo "$REQUIRED_SERVICES" | jq -r '.[]')
+
+        if [[ -n "$COMPOSE_FILE_OVERRIDE" && -f "$COMPOSE_FILE_OVERRIDE" ]]; then
+          echo "Using overridden compose file: '$COMPOSE_FILE_OVERRIDE'"
+          docker-compose -f "$COMPOSE_FILE_OVERRIDE" up -d $EXTRA_ARGS
+        else
+          echo "No valid override compose file found or not provided. Using default docker-compose.yml"
+          docker-compose up -d $EXTRA_ARGS
+        fi
+
+        for service in $services; do
+          echo "⏳ Waiting for service '$service' to be healthy..."
+          while true; do
+            container_id=$(docker-compose ps -q "$service")
+            if [ -z "$container_id" ]; then
+              echo "❌ Service '$service' not found or not running."
+              exit 1
+            fi
+
+            health_status=$(docker inspect -f '{{.State.Health.Status}}' "$container_id")
+
+            if [ "$health_status" == "healthy" ]; then
+              echo "✅ $service is healthy."
+              break
+            else
+              echo "⏳ $service health: $health_status"
+              sleep 1
+            fi
+          done
+        done
+
+    - name: Run Tests
+      id: run-tests
+      shell: bash
+      run: |
         echo "Running Swift Tests"
+        cd "$WORKDIR"
         if swift test ${{ inputs.extra_args }}; then
           echo "Swift tests passed."
           echo "exit-code=0" >> "$GITHUB_OUTPUT"
