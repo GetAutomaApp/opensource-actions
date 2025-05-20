@@ -88,13 +88,6 @@ runs:
           fi
         fi
 
-    - name: Restore Build Cache
-      id: cache-build-restore
-      uses: actions/cache/restore@v4
-      with:
-        key: deploy-cache-${{ hashFiles('${{ inputs.working-directory }}/Package.resolved') }}
-        path: ${{ inputs.working-directory }}/.build
-
     - name: Run Tests
       id: run-tests
       shell: bash
@@ -130,10 +123,3 @@ runs:
           echo "exit-code=1" >> "$GITHUB_OUTPUT"
           exit 1
         fi
-
-    - name: Save Build Cache
-      id: cache-build-save
-      uses: actions/cache/save@v4
-      with:
-        path: ${{ inputs.working-directory }}/.build
-        key: ${{ steps.cache-build-restore.outputs.cache-primary-key }}
