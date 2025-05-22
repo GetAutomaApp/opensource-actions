@@ -17,6 +17,10 @@ inputs:
     description: "If the compose file isnt in the working-directory set this path as an override (relative to working-directory)"
     required: false
     default: ""
+  compose_services_to_startup:
+    description: 'Array of docker-compose services to startup (all services not specified will not startup)'
+    required: true
+    default: '[]' # Expecting a JSON array of strings
   swift_test_extra_args:
     description: "Extra arguments to run swift tests"
     required: false
@@ -101,7 +105,8 @@ runs:
         WORKDIR="${{ inputs.working-directory }}"
         COMPOSE_FILE_OVERRIDE="${{ inputs.compose_file }}"
         EXTRA_ARGS="${{ inputs.docker_compose_extra_args }}"
-        REQUIRED_SERVICES='${{ inputs.required_healthy_services_docker_compose }}'
+        REQUIRED_SERVICES='${{ inputs.compose_services_to_startup }}'
+        REQUIRED_HEALTHY_SERVICES='${{ inputs.required_healthy_services_docker_compose }}'
 
         echo $WORKDIR
 
@@ -112,18 +117,18 @@ runs:
 
         cd "$WORKDIR"
 
-        echo "Parsing required services from input: $REQUIRED_SERVICES"
-        services=$(echo "$REQUIRED_SERVICES" | jq -r '.[]')
+        required_services=$(echo "$REQUIRED_SERVICES" | jq -r '.[]' | paste -sd' ' -)
+        healthy_services=$(echo "$REQUIRED_HEALTHY_SERVICES" | jq -r '.[]')
 
         if [[ -n "$COMPOSE_FILE_OVERRIDE" && -f "$COMPOSE_FILE_OVERRIDE" ]]; then
           echo "Using overridden compose file: '$COMPOSE_FILE_OVERRIDE'"
-          docker-compose -f "$COMPOSE_FILE_OVERRIDE" up -d $EXTRA_ARGS
+          docker-compose -f "$COMPOSE_FILE_OVERRIDE" up $required_services -d $EXTRA_ARGS
         else
           echo "No valid override compose file found or not provided. Using default docker-compose.yml"
-          docker-compose up -d $EXTRA_ARGS
+          docker-compose up $required_services -d $EXTRA_ARGS
         fi
 
-        for service in $services; do
+        for service in $healthy_services; do
           echo "⏳ Waiting for service '$service' to be healthy..."
           while true; do
             container_id=$(docker-compose ps -q "$service")
@@ -150,8 +155,7 @@ runs:
       run: |
         echo "Running Swift Tests"
         cd "$WORKDIR"
-        ls .build
-        if swift test ${{ inputs.swift_test_extra_args }}; then
+        if swift test -Xswiftc -warnings-as-errors ${{ inputs.swift_test_extra_args }}; then
           echo "Swift tests passed."
           echo "exit-code=0" >> "$GITHUB_OUTPUT"
         else
