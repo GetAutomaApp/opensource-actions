@@ -153,7 +153,7 @@ runs:
       run: |
         echo "Running Swift Tests"
         cd "$WORKDIR"
-        if swift test ${{ inputs.swift_test_extra_args }}; then
+        if swift test -Xswiftc -warnings-as-errors ${{ inputs.swift_test_extra_args }}; then
           echo "Swift tests passed."
           echo "exit-code=0" >> "$GITHUB_OUTPUT"
         else
