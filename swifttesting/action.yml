@@ -103,6 +103,8 @@ runs:
         EXTRA_ARGS="${{ inputs.docker_compose_extra_args }}"
         REQUIRED_SERVICES='${{ inputs.required_healthy_services_docker_compose }}'
 
+        echo $WORKDIR
+
         if [[ "$COMPOSE_ENABLED" == "false" ]]; then
           echo "Skipping docker-compose setup as it's disabled."
           exit 0
