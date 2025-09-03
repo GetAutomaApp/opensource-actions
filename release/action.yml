@@ -41,16 +41,16 @@ runs:
     - name: Setup Release Action
       shell: bash
       run: |
-        mkdir -p "${{ github.action_path }}/.release"
-        cp "${{ github.action_path }}/release.js" "${{ github.action_path }}/.release/release.js"
-        cd "${{ github.action_path }}/.release"
+        mkdir -p "${{ github.action_path }}/release-temp"
+        cp "${{ github.action_path }}/release.js" "${{ github.action_path }}/release-temp/release.js"
+        cd "${{ github.action_path }}/release-temp"
         npm init -y
         npm install @actions/core @actions/github semver
 
     - name: Run Release Script
       shell: bash
       run: |
-        node "${{ github.action_path }}/.release/release.js"
+        node "${{ github.action_path }}/release-temp/release.js"
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         CONFIG_PATH: ${{ inputs.config-path }}
