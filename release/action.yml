@@ -1,0 +1,57 @@
+name: 'Release'
+description: 'A GitHub action that makes releasing code easier! Uses a declarative "release-config.json" config file to create a release easily!'
+branding:
+  icon: 'code'
+  color: 'orange'
+
+inputs:
+  github-token:
+    description: 'GitHub token for creating the release'
+    required: true
+  config-path:
+    description: 'Path to the release config file'
+    required: false
+    default: '/tmp/release-action/release-config.json'
+  assets-path:
+    description: 'Path to release assets directory'
+    required: false
+    default: '/tmp/release-action/assets'
+
+outputs:
+  release-url:
+    description: 'The URL of the created release'
+  release-id:
+    description: 'The ID of the created release'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Node.js LTS
+      shell: bash
+      run: |
+        set -euo pipefail
+        VERSION="v22.14.0"
+        ARCH="linux-x64"
+        URL="https://nodejs.org/dist/${VERSION}/node-${VERSION}-${ARCH}.tar.xz"
+        curl -fsSL "$URL" -o node.tar.xz
+        tar -xf node.tar.xz
+        mv "node-${VERSION}-${ARCH}" /tmp/node
+        echo "/tmp/node/bin" >> $GITHUB_PATH
+
+    - name: Setup Release Action
+      shell: bash
+      run: |
+        mkdir -p "${{ github.action_path }}/.release"
+        cp "${{ github.action_path }}/release.js" "${{ github.action_path }}/.release/release.js"
+        cd "${{ github.action_path }}/.release"
+        npm init -y
+        npm install @actions/core @actions/github semver
+
+    - name: Run Release Script
+      shell: bash
+      run: |
+        node "${{ github.action_path }}/.release/release.js"
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        CONFIG_PATH: ${{ inputs.config-path }}
+        ASSETS_PATH: ${{ inputs.assets-path }}

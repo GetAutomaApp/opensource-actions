@@ -1,0 +1,1 @@
+The Release Action will automatically / via workflow dispatch create a release by reading all the files from /tmp/release-action/ and using release-config.json as the configuration to release, and assets/ as the release assets to publish.
