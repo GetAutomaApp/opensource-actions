@@ -152,20 +152,7 @@ class ReleaseAction {
   async addDiffFromPreviousRelease() {
     if (!this.previousTag) return;
 
-    const commits = await this.octokit.rest.repos.listCommits({
-      owner: this.context.repo.owner,
-      repo: this.context.repo.repo,
-      sha: this.context.sha
-    });
-
-    if (commits.data.length > 0) {
-      this.description += `\n\n### Diff from previous release (${this.previousTag})\n`;
-      commits.data.forEach(c => {
-        this.description += `- ${c.commit.message} (${c.sha.substring(0, 7)})\n`;
-      });
-
-      this.description += `\n[Compare changes](https://github.com/${this.context.repo.owner}/${this.context.repo.repo}/compare/${this.previousTag}...${this.tag})\n`;
-    }
+    this.description += `\n[Compare changes](https://github.com/${this.context.repo.owner}/${this.context.repo.repo}/compare/${this.previousTag}...${this.tag})\n`;
   }
 
   async applyDescriptorMappings() {
