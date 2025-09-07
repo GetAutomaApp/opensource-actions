@@ -220,9 +220,9 @@ class ReleaseAction {
 
   async run() {
     await this.loadConfig();
-    await this.determineBump();
-    this.determineNewVersion();
     await this.buildPlaceholders();
+    await this.determineBump();
+    await this.determineNewVersion();
     await this.buildTitle();
     await this.buildDescription();
     await this.createRelease();
