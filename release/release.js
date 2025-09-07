@@ -160,7 +160,7 @@ class ReleaseAction {
   async addDiffFromPreviousRelease() {
     if (!this.previousTag) return;
 
-    this.description += `\n[Compare changes](https://github.com/${this.context.repo.owner}/${this.context.repo.repo}/compare/${this.previousTag}...${this.tag})\n`;
+    this.description += `\n### Diff From Previous Release\n[Compare changes](https://github.com/${this.context.repo.owner}/${this.context.repo.repo}/compare/${this.previousTag}...${this.tag})\n`;
   }
 
   async applyDescriptorMappings() {
