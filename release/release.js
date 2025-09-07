@@ -56,10 +56,18 @@ class ReleaseAction {
 
   async determineBump() {
     let bumpRaw = this.config.bump || "patch";
-    bumpRaw = await this.replacePlaceholders(bumpRaw);
+    bumpRaw = (await this.replacePlaceholders(bumpRaw)).toLowerCase().trim();
 
     const validBumps = ["major", "minor", "patch", "pre-release"];
-    this.bump = validBumps.includes(bumpRaw) ? bumpRaw : "patch";
+
+    if (validBumps.includes(bumpRaw)) {
+      this.bump = bumpRaw;
+      return;
+    }
+
+    // #s means it can be anywhere in the text!
+    const foundTag = validBumps.find(b => bumpRaw.includes(`#${b}`))
+    this.bump = foundTag || "patch";
   }
 
   async getLatestTag() {
@@ -131,7 +139,7 @@ class ReleaseAction {
     });
   }
 
-  async addNewContributors() {
+  async addContributors() {
     const commits = await this.octokit.rest.repos.listCommits({
       owner: this.context.repo.owner,
       repo: this.context.repo.repo,
@@ -144,7 +152,7 @@ class ReleaseAction {
     });
 
     if (contributors.size > 0) {
-      this.description += "\n\n### New contributors\n";
+      this.description += "\n\n### Contributors\n";
       contributors.forEach(u => (this.description += `- @${u}\n`));
     }
   }
@@ -158,7 +166,7 @@ class ReleaseAction {
   async applyDescriptorMappings() {
     const descriptorMappings = {
       "commits": this.addCommitsSinceLastRelease.bind(this),
-      "new-contributors": this.addNewContributors.bind(this),
+      "contributors": this.addContributors.bind(this),
       "diff-from-previous-release": this.addDiffFromPreviousRelease.bind(this),
     };
 
