@@ -40,7 +40,7 @@ runs:
     - name: Install SwiftLint
       shell: bash
       run: |
-        curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux.zip -o swiftlint.zip
+        curl -L https://github.com/realm/SwiftLint/releases/latest/download/swiftlint_linux_amd64.zip -o swiftlint.zip
         unzip -n swiftlint.zip
         chmod +x swiftlint
         sudo mv swiftlint /tmp/swiftlint
