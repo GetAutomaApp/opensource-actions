@@ -18,9 +18,9 @@ inputs:
     required: false
     default: ""
   compose_services_to_startup:
-    description: 'Array of docker-compose services to startup (all services not specified will not startup)'
+    description: "Array of docker-compose services to startup (all services not specified will not startup)"
     required: true
-    default: '[]' # Expecting a JSON array of strings
+    default: "[]" # Expecting a JSON array of strings
   swift_test_extra_args:
     description: "Extra arguments to run swift tests"
     required: false
@@ -30,9 +30,13 @@ inputs:
     required: false
     default: ""
   required_healthy_services_docker_compose:
-    description: 'Array of docker-compose services that must be healthy before running tests'
+    description: "Array of docker-compose services that must be healthy before running tests"
     required: false
-    default: '[]' # Expecting a JSON array of strings
+    default: "[]" # Expecting a JSON array of strings
+  gh_pat:
+    description: "Github personal access token used to clone repositories for all packages used in testable target."
+    required: false
+    default: "" # Expecting a JSON array of strings
 
 outputs:
   exit-code:
@@ -146,6 +150,17 @@ runs:
             fi
           done
         done
+
+    - name: Configure Git
+      id: configure-git
+      shell: bash
+      run: |
+        GH_PAT='${{ inputs.gh_pat }}'
+        if [[ "$GH_PAT" == "" ]]; then
+          echo "Github personal access token input not set. Skipping configuring Git."
+          exit 0
+        fi
+        git config --global url."https://x-access-token:${GH_PAT}@github.com/".insteadOf "https://github.com/"
 
     - name: Run Tests
       id: run-tests
