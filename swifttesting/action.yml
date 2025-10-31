@@ -100,6 +100,9 @@ runs:
           fi
         fi
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Wait for required services to be healthy
       shell: bash
       run: |
