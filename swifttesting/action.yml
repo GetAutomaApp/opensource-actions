@@ -37,6 +37,10 @@ inputs:
     description: "Github personal access token used to clone repositories for all packages used in testable target."
     required: false
     default: "" # Expecting a JSON array of strings
+  skip-tests:
+    description: "Skip the run test step. This usually means tests are running as a docker-compose service. Note that swift test arguments as input will not be used then."
+    required: false
+    default: "false"
 
 outputs:
   exit-code:
@@ -170,6 +174,11 @@ runs:
       shell: bash
       run: |
         echo "Running Swift Tests"
+        SKIP_TESTS='${{ inputs.skip-tests }}'
+        if [[ "$SKIP_TESTS" == "true" ]]; then
+          echo "Skipping swift test execution step as skip-tests are set to true."
+          exit 0
+        fi
         cd "${{ inputs.working-directory }}"
         if swift test -Xswiftc -warnings-as-errors ${{ inputs.swift_test_extra_args }}; then
           echo "Swift tests passed."
