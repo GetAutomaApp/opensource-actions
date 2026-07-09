@@ -37,10 +37,10 @@ inputs:
     description: "Github personal access token used to clone repositories for all packages used in testable target."
     required: false
     default: "" # Expecting a JSON array of strings
-  skip-tests:
-    description: "Skip the run test step. This usually means tests are running as a docker-compose service. Note that swift test arguments as input will not be used then."
+  tests-as-compose-service-name:
+    description: "Run service in docker-compose instead of swift test command."
     required: false
-    default: "false"
+    default: ""
 
 outputs:
   exit-code:
@@ -125,10 +125,12 @@ runs:
 
         required_services=$(echo "$REQUIRED_SERVICES" | jq -r '.[]' | paste -sd' ' -)
         healthy_services=$(echo "$REQUIRED_HEALTHY_SERVICES" | jq -r '.[]')
+        TEST_AS_COMPOSE_SERVICE_NAME='${{ inputs.tests-as-compose-service-name }}'
 
         if [[ -n "$COMPOSE_FILE_OVERRIDE" && -f "$COMPOSE_FILE_OVERRIDE" ]]; then
           echo "Using overridden compose file: '$COMPOSE_FILE_OVERRIDE'"
           docker-compose -f "$COMPOSE_FILE_OVERRIDE" up $required_services -d $EXTRA_ARGS
+
         else
           echo "No valid override compose file found or not provided. Using default docker-compose.yml"
           docker-compose up $required_services -d $EXTRA_ARGS
@@ -152,8 +154,19 @@ runs:
               echo "⏳ $service health: $health_status"
               sleep 1
             fi
+
           done
         done
+
+        if [[ -n "$COMPOSE_FILE_OVERRIDE" && -f "$COMPOSE_FILE_OVERRIDE" ]]; then
+          if [[ "$TEST_AS_COMPOSE_SERVICE_NAME" != "" ]]; then
+            docker-compose -f "$COMPOSE_FILE_OVERRIDE" up $TEST_AS_COMPOSE_SERVICE_NAME
+          fi
+        else
+          if [[ "$TEST_AS_COMPOSE_SERVICE_NAME" != "" ]]; then
+            docker-compose up $TEST_AS_COMPOSE_SERVICE_NAME
+          fi
+        fi
 
     - name: Configure Git
       id: configure-git
@@ -171,11 +184,13 @@ runs:
       shell: bash
       run: |
         echo "Running Swift Tests"
-        SKIP_TESTS='${{ inputs.skip-tests }}'
-        if [[ "$SKIP_TESTS" == "true" ]]; then
-          echo "Skipping swift test execution step as skip-tests are set to true."
+
+        TEST_AS_COMPOSE_SERVICE_NAME='${{ inputs.tests-as-compose-service-name }}'
+        if [[ "$TEST_AS_COMPOSE_SERVICE_NAME" != "" ]]; then
+          echo "Skipping swift test execution step as tests are run in docker, because 'tests-as-compose-service-name' are defined"
           exit 0
         fi
+
         cd "${{ inputs.working-directory }}"
         if swift test -Xswiftc -warnings-as-errors ${{ inputs.swift_test_extra_args }}; then
           echo "Swift tests passed."
